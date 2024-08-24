@@ -1,0 +1,157 @@
+﻿@page "/notes"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using NotesWasm.Models
+@inject ILocalStorageService _localstorage;
+@inject NavigationManager Navigation
+
+<PageTitle>@notesTitle</PageTitle>
+
+<div class="container mt-2">
+
+    <h1 class="display-4">@notesTitle</h1>
+
+    <UserComponent currentUser="@savedUser" title="@userTitle">
+
+    </UserComponent>
+
+    <button class="btn btn-primary" @onclick="AddNotePage">@addTxt</button>
+
+    @if (notes != null && notes.Count() > 0)
+    {
+        <div class="grid mt-2">
+            <QuickGrid Items="notes.AsQueryable()" Pagination="@pagination">
+                <PropertyColumn Property="@(note => note.Title)" Title="@tableTitle" Sortable="true" />
+                <PropertyColumn Property="@(note => note.Content)" Title="@tableContent" Sortable="true" />
+                <TemplateColumn Title="@tableActions" Align="Align.Center">
+                    <div class="align-content-center">
+                        <button class="btn btn-secondary  mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
+                        <button class="btn btn-danger mt-2 mb-2" @onclick="@(() => DeleteNote(context))">@deleteTxt</button>
+                    </div>
+                </TemplateColumn>
+            </QuickGrid>
+        </div>
+        <div class="page-buttons">
+            @pageGrid:
+            @if (pagination.TotalItemCount.HasValue)
+            {
+                for (var pageIndex = 0; pageIndex <= pagination.LastPageIndex; pageIndex++)
+                {
+                    var capturedIndex = pageIndex;
+                    <button @onclick="@(() => GoToPageAsync(capturedIndex))"
+                            class="@PageButtonClass(capturedIndex)"
+                            aria-current="@AriaCurrentValue(capturedIndex)"
+                            aria-label="Go to page @(pageIndex + 1)">
+                        @(pageIndex + 1)
+                    </button>
+                }
+            }
+        </div>
+
+
+    }
+
+
+</div>
+
+
+
+
+@code {
+    [CascadingParameter(Name = "currentLanguage")]
+    public string currentLanguage { get; set; }
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+
+    public List<Note> notes { get; set; } = new List<Note>();
+
+    public string notesTitle { get; set; } = string.Empty;
+
+    public string savedUser { get; set; } = string.Empty;
+
+    public string userTitle { get; set; } = string.Empty;
+
+    public string addTxt { get; set; } = string.Empty;
+
+    public string editTxt { get; set; } = string.Empty;
+
+    public string deleteTxt { get; set; } = string.Empty;
+
+    public string tableTitle { get; set; } = string.Empty;
+
+    public string tableContent { get; set; } = string.Empty;
+
+    public string tableActions { get; set; } = string.Empty;
+
+    public string pageGrid { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        savedUser = await _localstorage.GetItemAsync<string>("savedUser") ?? string.Empty;
+
+        if (string.IsNullOrEmpty(savedUser))
+        {
+            Navigation.NavigateTo("/");
+        }
+
+        await UpdateTranslationsAsync();
+
+        await LoadNotesAsync();
+
+        pagination.TotalItemCountChanged += (sender, eventArgs) => StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateTranslationsAsync();
+    }
+
+    private async Task UpdateTranslationsAsync()
+    {
+        userTitle = Language.GetTranslation("User", currentLanguage);
+        notesTitle = Language.GetTranslation("NotesTitle", currentLanguage);
+        addTxt = Language.GetTranslation("Add", currentLanguage);
+        editTxt = Language.GetTranslation("Edit", currentLanguage);
+        deleteTxt = Language.GetTranslation("Delete", currentLanguage);
+        tableTitle = Language.GetTranslation("Title", currentLanguage);
+        tableContent = Language.GetTranslation("Content", currentLanguage);
+        tableActions = Language.GetTranslation("Actions", currentLanguage);
+        pageGrid = Language.GetTranslation("Page", currentLanguage);
+    }
+
+    private async Task LoadNotesAsync()
+    {
+        notes = await _localstorage.GetItemAsync<List<Note>>("notes") ?? new List<Note>();
+    }
+
+    private void AddNotePage()
+    {
+        Navigation.NavigateTo("/notes/current/0");
+    }
+
+    private void EditNotePage(Note note)
+    {
+        Navigation.NavigateTo($"/notes/current/{note.Id}");
+    }
+
+    private void DeleteNote(Note note)
+    {
+        Note noteToDelete = notes.FirstOrDefault(n => n.Id == note.Id);
+        if (noteToDelete != null)
+        {
+            notes.Remove(noteToDelete);
+            _localstorage.SetItemAsync("notes", notes);
+        }
+    }
+
+    private async Task GoToPageAsync(int pageIndex)
+    {
+        await pagination.SetCurrentPageIndexAsync(pageIndex);
+    }
+
+    private string? PageButtonClass(int pageIndex)
+        => pagination.CurrentPageIndex == pageIndex ? "current" : null;
+
+    private string? AriaCurrentValue(int pageIndex)
+        => pagination.CurrentPageIndex == pageIndex ? "page" : null;
+
+}

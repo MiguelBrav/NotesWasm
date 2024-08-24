@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+<div class="page">
+    <CascadingValue Value="currentLanguage" Name="currentLanguage">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+         
+                <div class="top-row px-4">
+                <select  @onchange="OnLanguageChange" class="form-select-lg">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                </select>
+                </div>
+
+                <article class="content px-4">
+                    @Body
+                </article>
+           
+
+    </main>
+    </CascadingValue>
+</div>
+
+
+@code {
+    private string currentLanguage = "en";
+
+    private string currentUser { get; set; } = string.Empty;
+
+    private void OnLanguageChange(ChangeEventArgs e)
+    {
+        currentLanguage = e.Value.ToString();
+        StateHasChanged(); 
+    }
+}

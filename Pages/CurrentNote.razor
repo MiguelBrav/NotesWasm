@@ -1,0 +1,121 @@
+﻿@page "/notes/current/{id:int?}"
+@using NotesWasm.Models
+@inject ILocalStorageService _localstorage;
+@inject NavigationManager Navigation
+
+<PageTitle>@notesTitle</PageTitle>
+
+<div class="container mt-2">
+
+    <h1 class="display-4">@currentTitle</h1>
+
+    <UserComponent currentUser="@savedUser" title="@userTitle">
+
+    </UserComponent>
+
+    <EditForm Model="currentNote" OnValidSubmit="HandleValidSubmit">
+        <div class="mb-3">
+            <label for="noteTitle" class="form-label">@noteTitle</label>
+            <InputText id="noteTitle" class="form-control" @bind-Value="currentNote.Title" required />
+        </div>
+        <div class="mb-3">
+            <label for="noteContent" class="form-label">@noteContent</label>
+            <InputTextArea id="noteContent" class="form-control" @bind-Value="currentNote.Content" required />
+        </div>
+        <button type="submit" class="btn btn-primary">@save</button>
+        <button type="button" class="btn btn-secondary" @onclick="GoBack">@returnTxt</button>
+    </EditForm>
+</div>
+
+
+
+
+@code {
+    [CascadingParameter(Name = "currentLanguage")]
+    public string currentLanguage { get; set; }
+    [Parameter]
+    public int? Id { get; set; }
+    public List<Note> notes { get; set; } = new List<Note>();
+    public Note currentNote { get; set; } = new Note();
+    public string savedUser { get; set; } = string.Empty;
+    public string userTitle { get; set; } = string.Empty;
+    public string currentTypeTitle { get; set; } = string.Empty;
+    public string currentTitle { get; set; } = string.Empty;
+    public string save { get; set; } = string.Empty;
+    public string noteTitle { get; set; } = string.Empty;
+    public string noteContent { get; set; } = string.Empty;
+    public string notesTitle { get; set; } = string.Empty;
+    public string returnTxt { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentTypeTitle = (Id == 0) ? "Add" : "Edit";
+
+        await LoadNotesAsync();
+
+        await UpdateTranslationsAsync();
+
+        savedUser = await _localstorage.GetItemAsync<string>("savedUser") ?? string.Empty;
+
+    }
+
+    private async Task LoadNotesAsync()
+    {
+        notes = await _localstorage.GetItemAsync<List<Note>>("notes") ?? new List<Note>();
+
+        if (Id != 0 && Id.HasValue)
+        {
+           currentNote = notes.FirstOrDefault(n => n.Id == Id.Value);
+
+            if (currentNote == null)
+            {
+                currentNote = new Note();
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (currentNote.Id == 0)
+        {
+            currentNote.Id = notes.Count() + 1;
+            notes.Add(currentNote);
+        }
+        else
+        {
+            var existingNote = notes.FirstOrDefault(n => n.Id == currentNote.Id);
+            if (existingNote != null)
+            {
+                existingNote.Title = currentNote.Title;
+                existingNote.Content = currentNote.Content;
+            }
+        }
+
+        await _localstorage.SetItemAsync("notes", notes);
+        currentNote = new Note();
+        
+        Navigation.NavigateTo("/notes");
+    }
+
+    private async Task UpdateTranslationsAsync()
+    {
+        userTitle = Language.GetTranslation("User", currentLanguage);
+        currentTitle = Language.GetTranslation(currentTypeTitle,currentLanguage);
+        save = Language.GetTranslation("Save", currentLanguage);
+        noteTitle = Language.GetTranslation("Title", currentLanguage);
+        noteContent = Language.GetTranslation("Content", currentLanguage);
+        notesTitle = Language.GetTranslation("NotesTitle", currentLanguage);
+        returnTxt = Language.GetTranslation("Return", currentLanguage);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateTranslationsAsync();
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/notes"); 
+    }
+
+}

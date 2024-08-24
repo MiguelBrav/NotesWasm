@@ -1,0 +1,88 @@
+﻿@page "/"
+@using NotesWasm.Data
+@inject ILocalStorageService _localstorage;
+
+<PageTitle>@homeTitle</PageTitle>
+
+<div class="container mt-2">
+
+   <h1 class="display-4">@greetings</h1>
+
+    <UserComponent currentUser="@savedUser" title="@userTitle">
+
+    </UserComponent>
+
+
+    <p class="lead">@greetingsMessage</p>
+
+    @if (string.IsNullOrEmpty(savedUser))
+    {
+
+        <div class="alert alert-warning mt-4">
+            @instruction
+
+            <div>
+                <input type="text" @bind="@currentUser" />
+                <button @onclick="@update" class="btn btn-primary">@save</button>
+
+            </div>
+        </div>
+    }
+
+
+</div>
+
+@code {
+    [CascadingParameter(Name = "currentLanguage")]
+    public string currentLanguage { get; set; }
+
+    public string currentUser { get; set; } = string.Empty;
+
+    public string savedUser { get; set; } = string.Empty;
+
+    public string greetings { get; set; } = string.Empty;
+
+    public string greetingsMessage { get; set; } = string.Empty;
+
+    public string title { get; set; } = string.Empty;
+
+    public string instruction { get; set; } = string.Empty;
+
+    public string save { get; set; } = string.Empty;
+
+    public string userTitle { get; set; } = string.Empty;
+
+    public string homeTitle { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateTranslationsAsync();
+
+        savedUser = await _localstorage.GetItemAsync<string>("savedUser") ?? string.Empty;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateTranslationsAsync();
+    }
+
+    private async Task UpdateTranslationsAsync()
+    {
+        greetings = Language.GetTranslation("Greetings", currentLanguage);
+        greetingsMessage = Language.GetTranslation("MessageWelcome", currentLanguage);
+        title = Language.GetTranslation("HomeTitle", currentLanguage);
+        instruction = Language.GetTranslation("Instruction", currentLanguage);
+        save = Language.GetTranslation("Save", currentLanguage);
+        userTitle = Language.GetTranslation("User", currentLanguage);
+        homeTitle = Language.GetTranslation("HomeTitle", currentLanguage);
+    }
+
+    private void update()
+    {
+        savedUser = currentUser;    
+
+        _localstorage.SetItemAsync("savedUser", savedUser);
+    }
+
+
+}
