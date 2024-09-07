@@ -21,7 +21,14 @@ public class Language
         { "Content", new Dictionary<string, string> { { "en", "Description" }, { "es", "Descripción" } } },
         { "Actions", new Dictionary<string, string> { { "en", "Actions" }, { "es", "Acciones" } } },
         { "Return", new Dictionary<string, string> { { "en", "Return" }, { "es", "Volver" } } },
-        { "Page", new Dictionary<string, string> { { "en", "Page" }, { "es", "Página" } } }
+        { "Page", new Dictionary<string, string> { { "en", "Page" }, { "es", "Página" } } },
+        { "ReturnConfirm", new Dictionary<string, string> { { "en", "¿Do you want to go back to notes without saving?" }, 
+        { "es", "¿Deseas volver a las notas sin guardar?" } } },
+        { "ConfirmTitle", new Dictionary<string, string> { { "en", "Confirm" }, { "es", "Confirmar" } } },
+        { "Accept", new Dictionary<string, string> { { "en", "Accept" }, { "es", "Aceptar" } } },
+        { "Close", new Dictionary<string, string> { { "en", "Close" }, { "es", "Cerrar" } } },
+        { "DeleteConfirm", new Dictionary<string, string> { { "en", "¿Do you want to delete this note: {0}?" },
+        { "es", "¿Deseas eliminar esta nota: {0}?" }} }
     };
 
     public static string GetTranslation(string key, string languageCode)

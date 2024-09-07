@@ -25,7 +25,7 @@
                 <TemplateColumn Title="@tableActions" Align="Align.Center">
                     <div class="align-content-center">
                         <button class="btn btn-secondary  mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
-                        <button class="btn btn-danger mt-2 mb-2" @onclick="@(() => DeleteNote(context))">@deleteTxt</button>
+                        <button class="btn btn-danger mt-2 mb-2" @onclick="@(() => DeleteConfirmed(context))">@deleteTxt</button>
                     </div>
                 </TemplateColumn>
             </QuickGrid>
@@ -53,6 +53,7 @@
 
 </div>
 
+<NoteConfirmation @ref="deleteConfirmation" OnConfirmed="DeleteNote"></NoteConfirmation>
 
 
 
@@ -83,6 +84,8 @@
     public string tableActions { get; set; } = string.Empty;
 
     public string pageGrid { get; set; } = string.Empty;
+
+    private NoteConfirmation deleteConfirmation;
 
     protected override async Task OnInitializedAsync()
     {
@@ -141,6 +144,7 @@
             notes.Remove(noteToDelete);
             _localstorage.SetItemAsync("notes", notes);
         }
+        deleteConfirmation.Hide();
     }
 
     private async Task GoToPageAsync(int pageIndex)
@@ -153,5 +157,21 @@
 
     private string? AriaCurrentValue(int pageIndex)
         => pagination.CurrentPageIndex == pageIndex ? "page" : null;
+
+    private async Task DeleteConfirmed(Note currentNote)
+    {
+
+        deleteConfirmation.Show();
+
+        deleteConfirmation.BodyContent = string.Format(Language.GetTranslation("DeleteConfirm", currentLanguage), currentNote.Title);
+
+        deleteConfirmation.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
+
+        deleteConfirmation.ConfirmTxt = Language.GetTranslation("Accept", currentLanguage);
+
+        deleteConfirmation.CloseTxt = Language.GetTranslation("Close", currentLanguage);
+
+        deleteConfirmation.CurrentNote = currentNote;
+    }
 
 }

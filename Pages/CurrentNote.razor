@@ -23,10 +23,11 @@
             <InputTextArea id="noteContent" class="form-control" @bind-Value="currentNote.Content" required />
         </div>
         <button type="submit" class="btn btn-primary">@save</button>
-        <button type="button" class="btn btn-secondary" @onclick="GoBack">@returnTxt</button>
+        <button type="button" class="btn btn-secondary" @onclick="GoBackConfirmed">@returnTxt</button>
     </EditForm>
 </div>
 
+<SimpleConfirm @ref="backConfirmation" OnConfirmed="GoBack"></SimpleConfirm>
 
 
 
@@ -46,7 +47,7 @@
     public string noteContent { get; set; } = string.Empty;
     public string notesTitle { get; set; } = string.Empty;
     public string returnTxt { get; set; } = string.Empty;
-
+    private SimpleConfirm backConfirmation;
     protected override async Task OnInitializedAsync()
     {
         currentTypeTitle = (Id == 0) ? "Add" : "Edit";
@@ -115,7 +116,30 @@
 
     private void GoBack()
     {
+        backConfirmation.Hide();
+
         Navigation.NavigateTo("/notes"); 
+    }
+
+    private async Task GoBackConfirmed()
+    {      
+        if(!string.IsNullOrEmpty(currentNote.Title) || !string.IsNullOrEmpty(currentNote.Content))
+        {
+            backConfirmation.BodyContent = Language.GetTranslation("ReturnConfirm", currentLanguage);
+
+            backConfirmation.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
+
+            backConfirmation.ConfirmTxt = Language.GetTranslation("Accept", currentLanguage);
+
+            backConfirmation.CloseTxt = Language.GetTranslation("Close", currentLanguage);
+
+            backConfirmation.Show();
+
+        }
+        else
+        {
+            GoBack();
+        }
     }
 
 }
