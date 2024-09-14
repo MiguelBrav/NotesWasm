@@ -14,10 +14,12 @@
 
     </UserComponent>
 
-    <button class="btn btn-primary" @onclick="AddNotePage">@addTxt</button>
+    <button class="btn btn-primary" @onclick="AddNotePage">@addTxt</button>   
 
     @if (notes != null && notes.Count() > 0)
     {
+        <button class="btn btn-danger ms-3" @onclick="DeleteAllConfirmed">@deleteAllTxt</button>
+
         <div class="grid mt-2">
             <QuickGrid Items="notes.AsQueryable()" Pagination="@pagination">
                 <PropertyColumn Property="@(note => note.Title)" Title="@tableTitle" Sortable="true" />
@@ -55,7 +57,7 @@
 
 <NoteConfirmation @ref="deleteConfirmation" OnConfirmed="DeleteNote"></NoteConfirmation>
 
-
+<SimpleConfirm @ref="deleteAllConfirmation" OnConfirmed="DeleteAllNote"></SimpleConfirm>
 
 @code {
     [CascadingParameter(Name = "currentLanguage")]
@@ -77,6 +79,8 @@
 
     public string deleteTxt { get; set; } = string.Empty;
 
+    public string deleteAllTxt { get; set; } = string.Empty;
+
     public string tableTitle { get; set; } = string.Empty;
 
     public string tableContent { get; set; } = string.Empty;
@@ -86,6 +90,8 @@
     public string pageGrid { get; set; } = string.Empty;
 
     private NoteConfirmation deleteConfirmation;
+
+    private SimpleConfirm deleteAllConfirmation;
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,6 +125,7 @@
         tableContent = Language.GetTranslation("Content", currentLanguage);
         tableActions = Language.GetTranslation("Actions", currentLanguage);
         pageGrid = Language.GetTranslation("Page", currentLanguage);
+        deleteAllTxt = Language.GetTranslation("DeleteAll", currentLanguage);
     }
 
     private async Task LoadNotesAsync()
@@ -147,6 +154,13 @@
         deleteConfirmation.Hide();
     }
 
+    private void DeleteAllNote()
+    {
+        notes = new List<Note>();
+        _localstorage.SetItemAsync("notes", notes);
+        deleteAllConfirmation.Hide();
+    }
+
     private async Task GoToPageAsync(int pageIndex)
     {
         await pagination.SetCurrentPageIndexAsync(pageIndex);
@@ -172,6 +186,20 @@
         deleteConfirmation.CloseTxt = Language.GetTranslation("Close", currentLanguage);
 
         deleteConfirmation.CurrentNote = currentNote;
+    }
+
+    private async Task DeleteAllConfirmed()
+    {
+
+        deleteAllConfirmation.Show();
+
+        deleteAllConfirmation.BodyContent = Language.GetTranslation("DeleteAllConfirm", currentLanguage);
+
+        deleteAllConfirmation.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
+
+        deleteAllConfirmation.ConfirmTxt = Language.GetTranslation("Accept", currentLanguage);
+
+        deleteAllConfirmation.CloseTxt = Language.GetTranslation("Close", currentLanguage);
     }
 
 }

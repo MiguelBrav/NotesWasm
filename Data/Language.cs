@@ -28,7 +28,11 @@ public class Language
         { "Accept", new Dictionary<string, string> { { "en", "Accept" }, { "es", "Aceptar" } } },
         { "Close", new Dictionary<string, string> { { "en", "Close" }, { "es", "Cerrar" } } },
         { "DeleteConfirm", new Dictionary<string, string> { { "en", "¿Do you want to delete this note: {0}?" },
-        { "es", "¿Deseas eliminar esta nota: {0}?" }} }
+        { "es", "¿Deseas eliminar esta nota: {0}?" }} },
+        { "DeleteAllConfirm", new Dictionary<string, string> { { "en", "¿Do you want to delete all notes?" },
+        { "es", "¿Deseas eliminar todas las notas?" } } },
+        { "DeleteAll", new Dictionary<string, string> { { "en", "Delete All" },
+        { "es", "Borrar todo" } } }
     };
 
     public static string GetTranslation(string key, string languageCode)
