@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using NotesWasm.Data
+@using NotesWasm.Models
 @inject ILocalStorageService _localstorage;
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@homeTitle</PageTitle>
 
@@ -28,13 +30,35 @@
             </div>
         </div>
     }
+    else
+    {
 
+        <div class="mb-3">
+            <h2 class="display-8 fw-bold text-secondary">@profiletxt</h2>
+
+            <hr class="mt-4" />
+
+            <label for="userTxt" class="form-label fw-bold text-secondary">@userLabel</label>
+
+            <input id="usertTxt" type="text" class="form-control" @bind=@currentUser>
+
+            <button @onclick="@update" class="btn btn-primary mt-2">@save</button>
+
+            <button class="btn btn-danger mt-2" @onclick="DeleteAccountMSg">@deleteAccountTitle</button>
+
+        </div>
+    }
+
+
+    <SimpleConfirm @ref="deleteAccountConfirm" OnConfirmed="deleteAccount"></SimpleConfirm>
 
 </div>
 
 @code {
     [CascadingParameter(Name = "currentLanguage")]
     public string currentLanguage { get; set; }
+
+    private SimpleConfirm deleteAccountConfirm;
 
     public string currentUser { get; set; } = string.Empty;
 
@@ -53,6 +77,14 @@
     public string userTitle { get; set; } = string.Empty;
 
     public string homeTitle { get; set; } = string.Empty;
+
+    public string userLabel { get; set; } = string.Empty;
+
+    public string deleteAccountTxt { get; set; } = string.Empty;
+
+    public string deleteAccountTitle { get; set; } = string.Empty;
+
+    public string profiletxt { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,14 +107,52 @@
         save = Language.GetTranslation("Save", currentLanguage);
         userTitle = Language.GetTranslation("User", currentLanguage);
         homeTitle = Language.GetTranslation("HomeTitle", currentLanguage);
+        userLabel = Language.GetTranslation("ChangeUser", currentLanguage);
+        save = Language.GetTranslation("Save", currentLanguage);
+        deleteAccountTxt = Language.GetTranslation("DeleteAccount", currentLanguage);
+        deleteAccountTitle = Language.GetTranslation("DeleteAccountTitle", currentLanguage);
+        profiletxt = Language.GetTranslation("Profile", currentLanguage);
     }
 
-    private void update()
+    private async Task update()
     {
-        savedUser = currentUser;    
+        if (string.IsNullOrEmpty(currentUser))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", Language.GetTranslation("AlertName", currentLanguage));
 
-        _localstorage.SetItemAsync("savedUser", savedUser);
+            return;
+        }
+
+        savedUser = currentUser;
+        currentUser = string.Empty;
+
+        await _localstorage.SetItemAsync("savedUser", savedUser);
     }
 
+    private async Task deleteAccount()
+    {
+        currentUser = string.Empty;
+        savedUser = string.Empty;
+
+        await _localstorage.SetItemAsync("savedUser", string.Empty);
+
+        await _localstorage.SetItemAsync("notes", new List<Note>());
+
+        deleteAccountConfirm.Hide();
+    }
+
+    private async Task DeleteAccountMSg()
+    {
+
+        deleteAccountConfirm.Show();
+
+        deleteAccountConfirm.BodyContent = Language.GetTranslation("DeleteAccount", currentLanguage);
+
+        deleteAccountConfirm.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
+
+        deleteAccountConfirm.ConfirmTxt = Language.GetTranslation("Accept", currentLanguage);
+
+        deleteAccountConfirm.CloseTxt = Language.GetTranslation("Close", currentLanguage);
+    }
 
 }

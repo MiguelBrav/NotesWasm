@@ -32,7 +32,17 @@ public class Language
         { "DeleteAllConfirm", new Dictionary<string, string> { { "en", "¿Do you want to delete all notes?" },
         { "es", "¿Deseas eliminar todas las notas?" } } },
         { "DeleteAll", new Dictionary<string, string> { { "en", "Delete All" },
-        { "es", "Borrar todo" } } }
+        { "es", "Borrar todo" } } },
+        { "ChangeUser", new Dictionary<string, string> { { "en", "¿Change user name?" },
+        { "es", "¿Cambiar nombre de usuario?" } } },
+        { "DeleteAccountTitle", new Dictionary<string, string> { { "en", "Delete Account" },
+        { "es", "Eliminar Cuenta" } } },
+        { "DeleteAccount", new Dictionary<string, string> { { "en", "¿Do you want to delete your account and all notes? " },
+        { "es", "¿Deseas eliminar tu cuenta y todas las notas?" } } },
+        { "AlertName", new Dictionary<string, string> { { "en", "User name cannot be null" },
+        { "es", "El nombre de usuario no puede ser nulo" } } },
+        { "Profile", new Dictionary<string, string> { { "en", "Profile" },
+        { "es", "Perfil" } } }
     };
 
     public static string GetTranslation(string key, string languageCode)
