@@ -22,6 +22,16 @@
             <label for="noteContent" class="form-label">@noteContent</label>
             <InputTextArea id="noteContent" class="form-control" @bind-Value="currentNote.Content" required />
         </div>
+        <div class="mb-3">
+            <label for="noteCategory" class="form-label">@noteCategoryTitle</label>
+            <select id="noteCategory" class="form-select" @bind="currentNote.Category">
+                <option value="">@uncategorizedTxt</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Title">@category.Title</option>
+                }
+            </select>
+        </div>
         <button type="submit" class="btn btn-primary">@save</button>
         <button type="button" class="btn btn-secondary" @onclick="GoBackConfirmed">@returnTxt</button>
     </EditForm>
@@ -37,6 +47,8 @@
     [Parameter]
     public int? Id { get; set; }
     public List<Note> notes { get; set; } = new List<Note>();
+    public List<Category> categories { get; set; } = new List<Category>();
+
     public Note currentNote { get; set; } = new Note();
     public string savedUser { get; set; } = string.Empty;
     public string userTitle { get; set; } = string.Empty;
@@ -47,6 +59,9 @@
     public string noteContent { get; set; } = string.Empty;
     public string notesTitle { get; set; } = string.Empty;
     public string returnTxt { get; set; } = string.Empty;
+    public string noteCategoryTitle { get; set; } = string.Empty;
+    public string uncategorizedTxt { get; set; } = string.Empty;
+
     private SimpleConfirm backConfirmation;
     protected override async Task OnInitializedAsync()
     {
@@ -63,10 +78,11 @@
     private async Task LoadNotesAsync()
     {
         notes = await _localstorage.GetItemAsync<List<Note>>("notes") ?? new List<Note>();
+        categories = await _localstorage.GetItemAsync<List<Category>>("categories") ?? new List<Category>();
 
         if (Id != 0 && Id.HasValue)
         {
-           currentNote = notes.FirstOrDefault(n => n.Id == Id.Value);
+            currentNote = notes.FirstOrDefault(n => n.Id == Id.Value);
 
             if (currentNote == null)
             {
@@ -94,7 +110,7 @@
 
         await _localstorage.SetItemAsync("notes", notes);
         currentNote = new Note();
-        
+
         Navigation.NavigateTo("/notes");
     }
 
@@ -107,6 +123,8 @@
         noteContent = Language.GetTranslation("Content", currentLanguage);
         notesTitle = Language.GetTranslation("NotesTitle", currentLanguage);
         returnTxt = Language.GetTranslation("Return", currentLanguage);
+        noteCategoryTitle = Language.GetTranslation("Category", currentLanguage);
+        uncategorizedTxt = Language.GetTranslation("Uncategorized", currentLanguage);
     }
 
     protected override async Task OnParametersSetAsync()

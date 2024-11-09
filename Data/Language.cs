@@ -37,12 +37,24 @@ public class Language
         { "es", "¿Cambiar nombre de usuario?" } } },
         { "DeleteAccountTitle", new Dictionary<string, string> { { "en", "Delete Account" },
         { "es", "Eliminar Cuenta" } } },
-        { "DeleteAccount", new Dictionary<string, string> { { "en", "¿Do you want to delete your account and all notes? " },
-        { "es", "¿Deseas eliminar tu cuenta y todas las notas?" } } },
+        { "DeleteAccount", new Dictionary<string, string> { { "en", "¿Do you want to delete your account and all notes/categories? " },
+        { "es", "¿Deseas eliminar tu cuenta y todas las notas/categorías?" } } },
         { "AlertName", new Dictionary<string, string> { { "en", "User name cannot be null" },
         { "es", "El nombre de usuario no puede ser nulo" } } },
         { "Profile", new Dictionary<string, string> { { "en", "Profile" },
-        { "es", "Perfil" } } }
+        { "es", "Perfil" } } },
+        { "Category", new Dictionary<string, string> { { "en", "Category" },
+        { "es", "Categoría" } } },
+        { "CategoryTitle", new Dictionary<string, string> { { "en", "Categories" }, { "es", "Categorías" } } },
+        { "Uncategorized", new Dictionary<string, string> { { "en", "Uncategorized" }, { "es", "No Categorizado" } } },
+        { "ReturnConfirmCat", new Dictionary<string, string> { { "en", "¿Do you want to go back to categories without saving?" },
+        { "es", "¿Deseas volver a las categorías sin guardar?" } } },
+        { "DeleteConfirmCat", new Dictionary<string, string> { { "en", "¿Do you want to delete this category: {0}?" },
+        { "es", "¿Deseas eliminar esta categoría: {0}?" }} },
+        { "DeleteAllConfirmCat", new Dictionary<string, string> { { "en", "¿Do you want to delete all categories?" },
+        { "es", "¿Deseas eliminar todas las categorías?" } } },
+        { "AlertCategory", new Dictionary<string, string> { { "en", "Category already exists" },
+        { "es", "La categoría ya existe" } } }
     };
 
     public static string GetTranslation(string key, string languageCode)

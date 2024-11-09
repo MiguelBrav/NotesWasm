@@ -138,6 +138,8 @@
 
         await _localstorage.SetItemAsync("notes", new List<Note>());
 
+        await _localstorage.SetItemAsync("categories", new List<Category>());
+
         deleteAccountConfirm.Hide();
     }
 

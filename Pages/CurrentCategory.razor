@@ -1,0 +1,162 @@
+﻿@page "/categories/current/{id:int?}"
+@using NotesWasm.Models
+@inject ILocalStorageService _localstorage;
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>@categoriesTitle</PageTitle>
+
+<div class="container mt-2">
+
+    <h1 class="display-4">@currentTitle</h1>
+
+    <UserComponent currentUser="@savedUser" title="@userTitle">
+
+    </UserComponent>
+
+    <EditForm Model="currentCategory" OnValidSubmit="HandleValidSubmit">
+        <div class="mb-3">
+            <label for="catTitle" class="form-label">@categoryTitle</label>
+            <InputText id="catTitle" class="form-control" @bind-Value="currentCategory.Title" required />
+        </div>
+        <button type="submit" class="btn btn-primary">@save</button>
+        <button type="button" class="btn btn-secondary" @onclick="GoBackConfirmed">@returnTxt</button>
+    </EditForm>
+</div>
+
+<SimpleConfirm @ref="backConfirmation" OnConfirmed="GoBack"></SimpleConfirm>
+
+
+
+@code {
+    [CascadingParameter(Name = "currentLanguage")]
+    public string currentLanguage { get; set; }
+    [Parameter]
+    public int? Id { get; set; }
+    public List<Category> categories { get; set; } = new List<Category>();
+    public Category currentCategory { get; set; } = new Category();
+    public string savedUser { get; set; } = string.Empty;
+    public string userTitle { get; set; } = string.Empty;
+    public string currentTypeTitle { get; set; } = string.Empty;
+    public string currentTitle { get; set; } = string.Empty;
+    public string save { get; set; } = string.Empty;
+    public string categoryTitle { get; set; } = string.Empty;
+    public string categoriesTitle { get; set; } = string.Empty;
+    public string returnTxt { get; set; } = string.Empty;
+    public string originalCategory { get; set; } = string.Empty;
+    private SimpleConfirm backConfirmation;
+    protected override async Task OnInitializedAsync()
+    {
+        currentTypeTitle = (Id == 0) ? "Add" : "Edit";
+
+        await LoadCategoriesAsync();
+
+        await UpdateTranslationsAsync();
+
+        savedUser = await _localstorage.GetItemAsync<string>("savedUser") ?? string.Empty;
+
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        categories = await _localstorage.GetItemAsync<List<Category>>("categories") ?? new List<Category>();
+
+        if (Id != 0 && Id.HasValue)
+        {
+            currentCategory = categories.FirstOrDefault(n => n.Id == Id.Value);
+
+            if (currentCategory == null)
+            {
+                currentCategory = new Category();
+            }
+
+            originalCategory = currentCategory.Title ?? string.Empty;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (currentCategory.Id == 0)
+        {
+            if (categories.Any(x => x.Title == currentCategory.Title))
+            {
+                await JSRuntime.InvokeVoidAsync("alert", Language.GetTranslation("AlertCategory", currentLanguage));
+                return;
+            }
+
+            currentCategory.Id = categories.Count() + 1;
+            categories.Add(currentCategory);
+        }
+        else
+        {
+            var existingCategory = categories.FirstOrDefault(n => n.Id == currentCategory.Id);
+            if (existingCategory != null)
+            {
+                if (categories.Any(x => x.Title == currentCategory.Title && x.Id != existingCategory.Id))
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", Language.GetTranslation("AlertCategory", currentLanguage));
+                    return;
+                }
+
+                existingCategory.Title = currentCategory.Title;
+
+                var notes = await _localstorage.GetItemAsync<List<Note>>("notes") ?? new List<Note>();
+
+                if (notes.Any() && !string.IsNullOrEmpty(originalCategory))
+                {
+                    notes.Where(x => x.Category == originalCategory).ToList().ForEach(x => x.Category = currentCategory.Title);
+                    await _localstorage.SetItemAsync("notes", notes);
+                }
+            }
+        }
+
+        await _localstorage.SetItemAsync("categories", categories);
+        currentCategory = new Category();
+        
+        Navigation.NavigateTo("/categories");
+    }
+
+    private async Task UpdateTranslationsAsync()
+    {
+        userTitle = Language.GetTranslation("User", currentLanguage);
+        currentTitle = Language.GetTranslation(currentTypeTitle,currentLanguage);
+        save = Language.GetTranslation("Save", currentLanguage);
+        categoryTitle = Language.GetTranslation("Title", currentLanguage);
+        categoriesTitle = Language.GetTranslation("CategoryTitle", currentLanguage);
+        returnTxt = Language.GetTranslation("Return", currentLanguage);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateTranslationsAsync();
+    }
+
+    private void GoBack()
+    {
+        backConfirmation.Hide();
+
+        Navigation.NavigateTo("/categories"); 
+    }
+
+    private async Task GoBackConfirmed()
+    {      
+        if(!string.IsNullOrEmpty(currentCategory.Title))
+        {
+            backConfirmation.BodyContent = Language.GetTranslation("ReturnConfirmCat", currentLanguage);
+
+            backConfirmation.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
+
+            backConfirmation.ConfirmTxt = Language.GetTranslation("Accept", currentLanguage);
+
+            backConfirmation.CloseTxt = Language.GetTranslation("Close", currentLanguage);
+
+            backConfirmation.Show();
+
+        }
+        else
+        {
+            GoBack();
+        }
+    }
+
+}

@@ -1,35 +1,32 @@
-﻿@page "/notes"
+﻿@page "/categories"
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using NotesWasm.Models
 @inject ILocalStorageService _localstorage;
 @inject NavigationManager Navigation
 
-<PageTitle>@notesTitle</PageTitle>
+<PageTitle>@categoriesTitle</PageTitle>
 
 <div class="container mt-2">
 
-    <h1 class="display-4">@notesTitle</h1>
+    <h1 class="display-4">@categoriesTitle</h1>
 
     <UserComponent currentUser="@savedUser" title="@userTitle">
 
     </UserComponent>
 
-    <button class="btn btn-primary" @onclick="AddNotePage">@addTxt</button>   
+    <button class="btn btn-primary" @onclick="AddCategoryPage">@addTxt</button>
 
-    @if (notes != null && notes.Count() > 0)
+    @if (categories != null && categories.Count() > 0)
     {
-        <button class="btn btn-danger ms-3" @onclick="DeleteAllConfirmed">@deleteAllTxt</button>
+        <button class="btn btn-danger ms-3" @onclick="DeleteAllCategories">@deleteAllTxt</button>
 
         <div class="grid mt-2">
-            <QuickGrid Items="notes.AsQueryable()" Pagination="@pagination">
-                <PropertyColumn Property="@(note => note.Title)" Title="@tableTitle" Sortable="true" />
-                <PropertyColumn Property="@(note => note.Content)" Title="@tableContent" Sortable="true" />
-                <PropertyColumn Property="@(note => string.IsNullOrEmpty(note.Category) ? Language.GetTranslation("Uncategorized", currentLanguage) : note.Category)"
-                                Title="@tableCategory"
-                                Sortable="true" />
+            <QuickGrid Items="categories.AsQueryable()" Pagination="@pagination">
+                <PropertyColumn Property="@(category => category.Title)" Title="@tableTitle" Sortable="true" />
+
                 <TemplateColumn Title="@tableActions" Align="Align.Center">
                     <div class="align-content-center">
-                        <button class="btn btn-secondary  mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
+                        <button class="btn btn-secondary  mt-2 mb-2" @onclick="@(() => EditCategoryPage(context))">@editTxt</button>
                         <button class="btn btn-danger mt-2 mb-2" @onclick="@(() => DeleteConfirmed(context))">@deleteTxt</button>
                     </div>
                 </TemplateColumn>
@@ -58,9 +55,9 @@
 
 </div>
 
-<NoteConfirmation @ref="deleteConfirmation" OnConfirmed="DeleteNote"></NoteConfirmation>
+<CategoryConfirmation @ref="deleteConfirmation" OnConfirmed="DeleteCategory"></CategoryConfirmation>
 
-<SimpleConfirm @ref="deleteAllConfirmation" OnConfirmed="DeleteAllNote"></SimpleConfirm>
+<SimpleConfirm @ref="deleteAllConfirmation" OnConfirmed="DeleteAllCategoriesConfirmed"></SimpleConfirm>
 
 @code {
     [CascadingParameter(Name = "currentLanguage")]
@@ -72,7 +69,7 @@
 
     public List<Category> categories { get; set; } = new List<Category>();
 
-    public string notesTitle { get; set; } = string.Empty;
+    public string categoriesTitle { get; set; } = string.Empty;
 
     public string savedUser { get; set; } = string.Empty;
 
@@ -88,15 +85,11 @@
 
     public string tableTitle { get; set; } = string.Empty;
 
-    public string tableContent { get; set; } = string.Empty;
-
-    public string tableCategory { get; set; } = string.Empty;
-
     public string tableActions { get; set; } = string.Empty;
 
     public string pageGrid { get; set; } = string.Empty;
 
-    private NoteConfirmation deleteConfirmation;
+    private CategoryConfirmation deleteConfirmation;
 
     private SimpleConfirm deleteAllConfirmation;
 
@@ -111,7 +104,7 @@
 
         await UpdateTranslationsAsync();
 
-        await LoadNotesAsync();
+        await LoadSessionAsync();
 
         pagination.TotalItemCountChanged += (sender, eventArgs) => StateHasChanged();
     }
@@ -124,52 +117,68 @@
     private async Task UpdateTranslationsAsync()
     {
         userTitle = Language.GetTranslation("User", currentLanguage);
-        notesTitle = Language.GetTranslation("NotesTitle", currentLanguage);
+        categoriesTitle = Language.GetTranslation("CategoryTitle", currentLanguage);
         addTxt = Language.GetTranslation("Add", currentLanguage);
         editTxt = Language.GetTranslation("Edit", currentLanguage);
         deleteTxt = Language.GetTranslation("Delete", currentLanguage);
         tableTitle = Language.GetTranslation("Title", currentLanguage);
-        tableContent = Language.GetTranslation("Content", currentLanguage);
         tableActions = Language.GetTranslation("Actions", currentLanguage);
-        tableCategory = Language.GetTranslation("Category", currentLanguage);
         pageGrid = Language.GetTranslation("Page", currentLanguage);
         deleteAllTxt = Language.GetTranslation("DeleteAll", currentLanguage);
     }
 
-    private async Task LoadNotesAsync()
+    private async Task LoadSessionAsync()
     {
         notes = await _localstorage.GetItemAsync<List<Note>>("notes") ?? new List<Note>();
+        categories = await _localstorage.GetItemAsync<List<Category>>("categories") ?? new List<Category>();
     }
 
-    private void AddNotePage()
+    private void AddCategoryPage()
     {
-        Navigation.NavigateTo("/notes/current/0");
+        Navigation.NavigateTo("/categories/current/0");
     }
 
-    private void EditNotePage(Note note)
+    private void EditCategoryPage(Category category)
     {
-        Navigation.NavigateTo($"/notes/current/{note.Id}");
+        Navigation.NavigateTo($"/categories/current/{category.Id}");
     }
 
-    private void DeleteNote(Note note)
+    private void DeleteCategory(Category category)
     {
-        Note noteToDelete = notes.FirstOrDefault(n => n.Id == note.Id);
-        if (noteToDelete != null)
+        Category categoryToDelete = categories.FirstOrDefault(n => n.Id == category.Id);
+        if (categoryToDelete != null)
         {
-            notes.Remove(noteToDelete);
-            for (int i = 0; i < notes.Count; i++)
+            categories.Remove(categoryToDelete);
+
+            if (notes.Any(x => x.Category == categoryToDelete.Title))
             {
-                notes[i].Id = i + 1;
+                notes.Where(x => x.Category == categoryToDelete.Title).ToList().ForEach(x => x.Category = string.Empty);
+                for (int i = 0; i < notes.Count; i++)
+                {
+                    notes[i].Id = i + 1;
+                }
+                _localstorage.SetItemAsync("notes", notes);
             }
-            _localstorage.SetItemAsync("notes", notes);
+            for (int i = 0; i < categories.Count; i++)
+            {
+                categories[i].Id = i + 1;
+            }
+            _localstorage.SetItemAsync("categories", categories);
         }
         deleteConfirmation.Hide();
     }
 
-    private void DeleteAllNote()
+    private void DeleteAllCategoriesConfirmed()
     {
-        notes = new List<Note>();
-        _localstorage.SetItemAsync("notes", notes);
+        categories = new List<Category>();
+
+        if (notes.Any())
+        {
+            notes.ForEach(x => x.Category = string.Empty);
+            _localstorage.SetItemAsync("notes", notes);
+        }
+
+        _localstorage.SetItemAsync("categories", categories);
         deleteAllConfirmation.Hide();
     }
 
@@ -184,12 +193,12 @@
     private string? AriaCurrentValue(int pageIndex)
         => pagination.CurrentPageIndex == pageIndex ? "page" : null;
 
-    private async Task DeleteConfirmed(Note currentNote)
+    private async Task DeleteConfirmed(Category currentCategory)
     {
 
         deleteConfirmation.Show();
 
-        deleteConfirmation.BodyContent = string.Format(Language.GetTranslation("DeleteConfirm", currentLanguage), currentNote.Title);
+        deleteConfirmation.BodyContent = string.Format(Language.GetTranslation("DeleteConfirmCat", currentLanguage), currentCategory.Title);
 
         deleteConfirmation.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
 
@@ -197,15 +206,15 @@
 
         deleteConfirmation.CloseTxt = Language.GetTranslation("Close", currentLanguage);
 
-        deleteConfirmation.CurrentNote = currentNote;
+        deleteConfirmation.CurrentCategory = currentCategory;
     }
 
-    private async Task DeleteAllConfirmed()
+    private async Task DeleteAllCategories()
     {
 
         deleteAllConfirmation.Show();
 
-        deleteAllConfirmation.BodyContent = Language.GetTranslation("DeleteAllConfirm", currentLanguage);
+        deleteAllConfirmation.BodyContent = Language.GetTranslation("DeleteAllConfirmCat", currentLanguage);
 
         deleteAllConfirmation.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
 
