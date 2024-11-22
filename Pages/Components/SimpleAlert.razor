@@ -1,0 +1,43 @@
+﻿@using NotesWasm.Models
+@if (showPopup)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Title</h5>
+                </div>
+                <div class="modal-body">
+                    <p>@BodyContent</p>
+                </div>
+                <div class="modal-footer">
+                    <button @onclick="Hide" type="button" class="btn btn-danger" data-bs-dismiss="modal">@CloseTxt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    private bool showPopup = false;
+
+    public string BodyContent { get; set; }
+
+    public string Title { get; set; }
+
+    public string CloseTxt { get; set; }
+
+    public void Show() => showPopup = true;
+
+    public void Hide() => showPopup = false;
+
+    [Parameter]
+    public EventCallback<bool> OnConfirmed { get; set; }
+
+    private async Task Confirm()
+    {
+        await OnConfirmed.InvokeAsync(true);
+    }
+}

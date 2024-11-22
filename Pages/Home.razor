@@ -52,6 +52,9 @@
 
     <SimpleConfirm @ref="deleteAccountConfirm" OnConfirmed="deleteAccount"></SimpleConfirm>
 
+    <SimpleAlert @ref="simpleAlert" OnConfirmed="closeAlert"></SimpleAlert>
+
+
 </div>
 
 @code {
@@ -59,6 +62,8 @@
     public string currentLanguage { get; set; }
 
     private SimpleConfirm deleteAccountConfirm;
+
+    private SimpleAlert simpleAlert;
 
     public string currentUser { get; set; } = string.Empty;
 
@@ -118,7 +123,7 @@
     {
         if (string.IsNullOrEmpty(currentUser))
         {
-            await JSRuntime.InvokeVoidAsync("alert", Language.GetTranslation("AlertName", currentLanguage));
+            await SimpleAlertShow();
 
             return;
         }
@@ -155,6 +160,24 @@
         deleteAccountConfirm.ConfirmTxt = Language.GetTranslation("Accept", currentLanguage);
 
         deleteAccountConfirm.CloseTxt = Language.GetTranslation("Close", currentLanguage);
+    }
+
+    private async Task SimpleAlertShow()
+    {
+
+        simpleAlert.Show();
+
+        simpleAlert.BodyContent = Language.GetTranslation("AlertName", currentLanguage);
+
+        simpleAlert.Title = Language.GetTranslation("ConfirmTitle", currentLanguage);
+
+        simpleAlert.CloseTxt = Language.GetTranslation("Close", currentLanguage);
+
+    }
+
+    private async Task closeAlert()
+    {
+        simpleAlert.Hide();
     }
 
 }
