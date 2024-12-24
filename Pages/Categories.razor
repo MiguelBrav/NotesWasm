@@ -3,6 +3,7 @@
 @using NotesWasm.Models
 @inject ILocalStorageService _localstorage;
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@categoriesTitle</PageTitle>
 
@@ -18,6 +19,8 @@
 
     @if (categories != null && categories.Count() > 0)
     {
+        <button class="btn btn-info text-light ms-3" @onclick="ExportToExcel">@exportTxt</button>
+
         <button class="btn btn-danger ms-3" @onclick="DeleteAllCategories">@deleteAllTxt</button>
 
         <div class="grid mt-2">
@@ -87,6 +90,8 @@
 
     public string tableActions { get; set; } = string.Empty;
 
+    public string exportTxt { get; set; } = string.Empty;
+
     public string pageGrid { get; set; } = string.Empty;
 
     private CategoryConfirmation deleteConfirmation;
@@ -123,6 +128,7 @@
         deleteTxt = Language.GetTranslation("Delete", currentLanguage);
         tableTitle = Language.GetTranslation("Title", currentLanguage);
         tableActions = Language.GetTranslation("Actions", currentLanguage);
+        exportTxt = Language.GetTranslation("ExportExcel", currentLanguage);
         pageGrid = Language.GetTranslation("Page", currentLanguage);
         deleteAllTxt = Language.GetTranslation("DeleteAll", currentLanguage);
     }
@@ -180,6 +186,18 @@
 
         _localstorage.SetItemAsync("categories", categories);
         deleteAllConfirmation.Hide();
+    }
+
+    private async Task ExportToExcel()
+    {
+        List<List<string>> data = new List<List<string>>()
+        {
+            new List<string> { tableTitle }
+        };
+
+        data.AddRange(categories.Select(category => new List<string>{ category.Title }));
+
+        await JSRuntime.InvokeVoidAsync("exportToExcel", data, $"{categoriesTitle}.csv");
     }
 
     private async Task GoToPageAsync(int pageIndex)

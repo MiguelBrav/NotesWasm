@@ -3,6 +3,7 @@
 @using NotesWasm.Models
 @inject ILocalStorageService _localstorage;
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@notesTitle</PageTitle>
 
@@ -18,6 +19,8 @@
 
     @if (notes != null && notes.Count() > 0)
     {
+        <button class="btn btn-info text-light ms-3" @onclick="ExportToExcel">@exportTxt</button>
+
         <button class="btn btn-danger ms-3" @onclick="DeleteAllConfirmed">@deleteAllTxt</button>
 
         <div class="grid mt-2">
@@ -94,6 +97,8 @@
 
     public string tableActions { get; set; } = string.Empty;
 
+    public string exportTxt { get; set; } = string.Empty;
+
     public string pageGrid { get; set; } = string.Empty;
 
     private NoteConfirmation deleteConfirmation;
@@ -132,6 +137,7 @@
         tableContent = Language.GetTranslation("Content", currentLanguage);
         tableActions = Language.GetTranslation("Actions", currentLanguage);
         tableCategory = Language.GetTranslation("Category", currentLanguage);
+        exportTxt = Language.GetTranslation("ExportExcel", currentLanguage);
         pageGrid = Language.GetTranslation("Page", currentLanguage);
         deleteAllTxt = Language.GetTranslation("DeleteAll", currentLanguage);
     }
@@ -171,6 +177,23 @@
         notes = new List<Note>();
         _localstorage.SetItemAsync("notes", notes);
         deleteAllConfirmation.Hide();
+    }
+
+    private async Task ExportToExcel()
+    {
+        List<List<string>> data = new List<List<string>>()
+        {
+            new List<string> { tableTitle, tableContent, tableCategory } 
+        };
+
+        data.AddRange(notes.Select(note => new List<string>
+        {
+            note.Title,
+            note.Content,
+            string.IsNullOrEmpty(note.Category) ? Language.GetTranslation("Uncategorized", currentLanguage) : note.Category
+        }));
+
+        await JSRuntime.InvokeVoidAsync("exportToExcel", data, $"{notesTitle}.csv");
     }
 
     private async Task GoToPageAsync(int pageIndex)

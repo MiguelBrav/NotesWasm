@@ -54,7 +54,9 @@ public class Language
         { "DeleteAllConfirmCat", new Dictionary<string, string> { { "en", "¿Do you want to delete all categories?" },
         { "es", "¿Deseas eliminar todas las categorías?" } } },
         { "AlertCategory", new Dictionary<string, string> { { "en", "Category already exists" },
-        { "es", "La categoría ya existe" } } }
+        { "es", "La categoría ya existe" } } },
+        { "ExportExcel", new Dictionary<string, string> { { "en", "Export" },
+        { "es", "Exportar" } } }
     };
 
     public static string GetTranslation(string key, string languageCode)
