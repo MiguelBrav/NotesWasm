@@ -23,7 +23,7 @@
 
         <button class="btn btn-danger ms-3" @onclick="DeleteAllConfirmed">@deleteAllTxt</button>
 
-        <div class="grid mt-2">
+        <div class="grid mt-2 table-responsive">
             <QuickGrid Items="notes.AsQueryable()" Pagination="@pagination">
                 <PropertyColumn Property="@(note => note.Title)" Title="@tableTitle" Sortable="true" />
                 <PropertyColumn Property="@(note => note.Content)" Title="@tableContent" Sortable="true" />
@@ -31,10 +31,10 @@
                                 Title="@tableCategory"
                                 Sortable="true" />
                 <TemplateColumn Title="@tableActions" Align="Align.Center">
-                    <div class="align-content-center">
-                        <button class="btn btn-secondary  mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
-                        <button class="btn btn-danger mt-2 mb-2" @onclick="@(() => DeleteConfirmed(context))">@deleteTxt</button>
-                    </div>
+                        <div class="d-flex justify-content-center w-100">
+                            <button class="btn btn-secondary mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
+                            <button class="btn btn-danger mt-2 mb-2 ml-2 mx-2" @onclick="@(() => DeleteConfirmed(context))">@deleteTxt</button>
+                        </div>
                 </TemplateColumn>
             </QuickGrid>
         </div>
