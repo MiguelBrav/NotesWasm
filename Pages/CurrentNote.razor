@@ -32,6 +32,10 @@
                 }
             </select>
         </div>
+        <div class="mb-3 form-check">
+            <label for="noteFavorite" class="form-check-label">@noteFavoriteTitle</label>
+            <input id="noteFavorite" type="checkbox" class="form-check-input" @bind="currentNote.IsFavorite" />
+        </div>
         <button type="submit" class="btn btn-primary">@save</button>
         <button type="button" class="btn btn-secondary" @onclick="GoBackConfirmed">@returnTxt</button>
     </EditForm>
@@ -60,6 +64,7 @@
     public string notesTitle { get; set; } = string.Empty;
     public string returnTxt { get; set; } = string.Empty;
     public string noteCategoryTitle { get; set; } = string.Empty;
+    public string noteFavoriteTitle { get; set; } = string.Empty;
     public string uncategorizedTxt { get; set; } = string.Empty;
 
     private SimpleConfirm backConfirmation;
@@ -125,6 +130,8 @@
         returnTxt = Language.GetTranslation("Return", currentLanguage);
         noteCategoryTitle = Language.GetTranslation("Category", currentLanguage);
         uncategorizedTxt = Language.GetTranslation("Uncategorized", currentLanguage);
+        noteFavoriteTitle =  Language.GetTranslation("Favorite", currentLanguage);
+
     }
 
     protected override async Task OnParametersSetAsync()

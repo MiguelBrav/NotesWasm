@@ -7,15 +7,15 @@
 
 <PageTitle>@notesTitle</PageTitle>
 
-<div class="container mt-2">
+    <div class="container mt-2">
 
-    <h1 class="display-4">@notesTitle</h1>
+        <h1 class="display-4">@notesTitle</h1>
 
     <UserComponent currentUser="@savedUser" title="@userTitle">
 
     </UserComponent>
 
-    <button class="btn btn-primary" @onclick="AddNotePage">@addTxt</button>   
+    <button class="btn btn-primary" @onclick="AddNotePage">@addTxt</button>
 
     @if (notes != null && notes.Count() > 0)
     {
@@ -30,11 +30,14 @@
                 <PropertyColumn Property="@(note => string.IsNullOrEmpty(note.Category) ? Language.GetTranslation("Uncategorized", currentLanguage) : note.Category)"
                                 Title="@tableCategory"
                                 Sortable="true" />
+                <TemplateColumn Title="@tableFavorite" Align="Align.Center">
+                    <input type="checkbox" class="form-check-input" @bind="context.IsFavorite" disabled />
+                </TemplateColumn>
                 <TemplateColumn Title="@tableActions" Align="Align.Center">
-                        <div class="d-flex justify-content-center w-100">
-                            <button class="btn btn-secondary mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
-                            <button class="btn btn-danger mt-2 mb-2 ml-2 mx-2" @onclick="@(() => DeleteConfirmed(context))">@deleteTxt</button>
-                        </div>
+                    <div class="d-flex justify-content-center w-100">
+                        <button class="btn btn-secondary mt-2 mb-2" @onclick="@(() => EditNotePage(context))">@editTxt</button>
+                        <button class="btn btn-danger mt-2 mb-2 ml-2 mx-2" @onclick="@(() => DeleteConfirmed(context))">@deleteTxt</button>
+                    </div>
                 </TemplateColumn>
             </QuickGrid>
         </div>
@@ -97,6 +100,8 @@
 
     public string tableActions { get; set; } = string.Empty;
 
+    public string tableFavorite { get; set; } = string.Empty;
+
     public string exportTxt { get; set; } = string.Empty;
 
     public string pageGrid { get; set; } = string.Empty;
@@ -137,6 +142,7 @@
         tableContent = Language.GetTranslation("Content", currentLanguage);
         tableActions = Language.GetTranslation("Actions", currentLanguage);
         tableCategory = Language.GetTranslation("Category", currentLanguage);
+        tableFavorite =  Language.GetTranslation("Favorite", currentLanguage);
         exportTxt = Language.GetTranslation("ExportExcel", currentLanguage);
         pageGrid = Language.GetTranslation("Page", currentLanguage);
         deleteAllTxt = Language.GetTranslation("DeleteAll", currentLanguage);
@@ -183,14 +189,15 @@
     {
         List<List<string>> data = new List<List<string>>()
         {
-            new List<string> { tableTitle, tableContent, tableCategory } 
+            new List<string> { tableTitle, tableContent, tableCategory, tableFavorite }
         };
 
         data.AddRange(notes.Select(note => new List<string>
         {
             note.Title,
             note.Content,
-            string.IsNullOrEmpty(note.Category) ? Language.GetTranslation("Uncategorized", currentLanguage) : note.Category
+            string.IsNullOrEmpty(note.Category) ? Language.GetTranslation("Uncategorized", currentLanguage) : note.Category,
+            note.IsFavorite ?  Language.GetTranslation("Favorite", currentLanguage) : Language.GetTranslation("NotFavorite", currentLanguage)
         }));
 
         await JSRuntime.InvokeVoidAsync("exportToExcel", data, $"{notesTitle}.csv");

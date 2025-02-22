@@ -56,7 +56,11 @@ public class Language
         { "AlertCategory", new Dictionary<string, string> { { "en", "Category already exists" },
         { "es", "La categoría ya existe" } } },
         { "ExportExcel", new Dictionary<string, string> { { "en", "Export" },
-        { "es", "Exportar" } } }
+        { "es", "Exportar" } } },
+        { "Favorite", new Dictionary<string, string> { { "en", "Favorite" },
+        { "es", "Favorito" } } },
+        { "NotFavorite", new Dictionary<string, string> { { "en", "Not Favorite" },
+        { "es", "No Favorito" } } }
     };
 
     public static string GetTranslation(string key, string languageCode)

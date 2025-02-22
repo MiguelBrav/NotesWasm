@@ -19,6 +19,10 @@
             <label for="catTitle" class="form-label">@categoryTitle</label>
             <InputText id="catTitle" class="form-control" @bind-Value="currentCategory.Title" required />
         </div>
+        <div class="mb-3 form-check">
+            <label for="noteFavorite" class="form-check-label">@categoryFavoriteTitle</label>
+            <input id="noteFavorite" type="checkbox" class="form-check-input" @bind="currentCategory.IsFavorite" />
+        </div>
         <button type="submit" class="btn btn-primary">@save</button>
         <button type="button" class="btn btn-secondary" @onclick="GoBackConfirmed">@returnTxt</button>
     </EditForm>
@@ -42,6 +46,7 @@
     public string save { get; set; } = string.Empty;
     public string categoryTitle { get; set; } = string.Empty;
     public string categoriesTitle { get; set; } = string.Empty;
+    public string categoryFavoriteTitle { get; set; } = string.Empty;
     public string returnTxt { get; set; } = string.Empty;
     public string originalCategory { get; set; } = string.Empty;
     private SimpleConfirm backConfirmation;
@@ -123,6 +128,7 @@
         save = Language.GetTranslation("Save", currentLanguage);
         categoryTitle = Language.GetTranslation("Title", currentLanguage);
         categoriesTitle = Language.GetTranslation("CategoryTitle", currentLanguage);
+        categoryFavoriteTitle =  Language.GetTranslation("Favorite", currentLanguage);
         returnTxt = Language.GetTranslation("Return", currentLanguage);
     }
 
