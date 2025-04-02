@@ -16,12 +16,11 @@ You need to enter the username first, and then you can start saving, editing, an
 
 You can checkout the project here: "https://notes.application-service.work/"
 
-![App Screenshot](hhttps://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes_p6esff.png)
-
-![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes03_nrdy2y.png)
+![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes_p6esff.png)
 
 ![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes02_idx1db.png)
 
+![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes03_nrdy2y.png)
 ## Feedback
 
 If you have any feedback, please reach out to me.
