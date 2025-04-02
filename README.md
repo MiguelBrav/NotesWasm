@@ -10,16 +10,17 @@ You need to enter the username first, and then you can start saving, editing, an
 - Delete Notes: Remove notes you no longer need.
 - Local Storage: Your notes are saved directly in your browser, meaning no external database or server storage is required.
 - Categories: Organize your notes by grouping them into categories. Easily create, assign, edit, or delete categories to keep your notes organized and accessible.
+- Favorites: Mark a note as a favorite, or remove it from favorites anytime.
 
 ## Usage example online
 
 You can checkout the project here: "https://notes.application-service.work/"
 
-![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1729203753/Github/NotesWasm01_eq1qyh.png)
+![App Screenshot](hhttps://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes_p6esff.png)
 
-![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1734408840/Github/l1eysk60ram1hojsfrpf.png)
+![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes03_nrdy2y.png)
 
-![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1734408908/Github/qtmnbvojknvfsoibbbzk.png)
+![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes02_idx1db.png)
 
 ## Feedback
 
