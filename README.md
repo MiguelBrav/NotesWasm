@@ -14,7 +14,7 @@ You need to enter the username first, and then you can start saving, editing, an
 
 ## Usage example online
 
-You can checkout the project here: "https://notes.application-service.work/"
+You can checkout the project here: "https://notes.segurab.com/"
 
 ![App Screenshot](https://res.cloudinary.com/imgresd/image/upload/v1743549333/Github/2025-Notes_p6esff.png)
 
