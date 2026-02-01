@@ -35,12 +35,21 @@
     [Parameter]
     public EventCallback<bool> OnConfirmed { get; set; }
 
-    public void Show() => showPopup = true;
+    public void Show()
+    {
+        showPopup = true;
+        _ = InvokeAsync(StateHasChanged);
+    }
 
-    public void Hide() => showPopup = false;
+    public void Hide()
+    {
+        showPopup = false;
+        _ = InvokeAsync(StateHasChanged);
+    }
 
     private async Task Confirm()
     {
         await OnConfirmed.InvokeAsync(true);
+        Hide();
     }
 }
